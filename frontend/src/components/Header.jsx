@@ -1,8 +1,4 @@
-import { useState } from 'react'
-
-function Header() {
-  const [search, setSearch] = useState('')
-
+function Header({ search, setSearch }) {
   return (
     <header className="topbar">
 

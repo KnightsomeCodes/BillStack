@@ -63,7 +63,7 @@ function MobileNav({ activePage, setActivePage }) {
         </button>
 
         <button
-          className={activePage === 'more' ? 'active' : ''}
+          className={['more', 'returns', 'history'].includes(activePage) ? 'active' : ''}
           onClick={() => setActivePage('more')}
         >
           <span>☰</span>
