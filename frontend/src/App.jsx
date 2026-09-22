@@ -5,6 +5,9 @@ import { useState } from 'react'
 
 function App() {
   const [activePage, setActivePage] = useState('home')
+  const [savedBills, setSavedBills] = useState(
+  JSON.parse(localStorage.getItem('billstack-bills')) || []
+)
   return (
     <div className="app">
 
@@ -15,40 +18,34 @@ function App() {
             <Header />
 
             <section className="bills-section">
-
               <div className="section-header">
                 <h2>Recent Bills</h2>
               </div>
 
               <div className="bill-list">
-
-                <BillCard
-                  vendor="Croma"
-                  category="Electronics"
-                  amount="8,999"
-                  date="Sep 12"
-                />
-
-                <BillCard
-                  vendor="Amazon"
-                  category="Food"
-                  amount="2,499"
-                  date="Sep 10"
-                />
-
-                <BillCard
-                  vendor="Flipkart"
-                  category="Electronics"
-                  amount="1,299"
-                  date="Sep 08"
-                />
-
+                {savedBills.length === 0 ? (
+                  <p className="empty-bills">
+                    No saved bills yet.
+                  </p>
+                ) : (
+                  savedBills.slice(-3).reverse().map((bill) => (
+                    <BillCard
+                      key={bill.id}
+                      vendor={bill.vendor}
+                      category={bill.category}
+                      amount={bill.totalAmount}
+                      date={bill.date}
+                    />
+                  ))
+                )}
               </div>
 
-              <button className="view-all">
+              <button
+                className="view-all"
+                onClick={() => setActivePage('bills')}
+              >
                 View All Bills →
               </button>
-
             </section>
           </>
         )}
@@ -60,28 +57,22 @@ function App() {
             </div>
 
             <div className="bill-list">
-
-              <BillCard
-                vendor="Croma"
-                category="Electronics"
-                amount="8,999"
-                date="Sep 12"
-              />
-
-              <BillCard
-                vendor="Amazon"
-                category="Food"
-                amount="2,499"
-                date="Sep 10"
-              />
-
-              <BillCard
-                vendor="Flipkart"
-                category="Electronics"
-                amount="1,299"
-                date="Sep 08"
-              />
-
+              {savedBills.length === 0 ? (
+                <div className="empty-bills">
+                  <strong>No bills yet</strong>
+                  <p>Your saved bills will appear here.</p>
+                </div>
+              ) : (
+                savedBills.map((bill) => (
+                  <BillCard
+                    key={bill.id}
+                    vendor={bill.vendor}
+                    category={bill.category}
+                    amount={bill.totalAmount}
+                    date={bill.date}
+                  />
+                ))
+              )}
             </div>
           </section>
         )}
@@ -119,19 +110,19 @@ function App() {
             </div>
 
             <div className="bill-list">
+              <button className="more-item">Profile</button>
+              <button className="more-item">Settings</button>
+              <button className="more-item">About BillStack</button>
 
-              <button className="more-item">
-                Profile
+              <button
+                className="more-item"
+                onClick={() => {
+                  localStorage.removeItem('billstack-bills')
+                  setSavedBills([])
+                }}
+              >
+                Clear All Bills
               </button>
-
-              <button className="more-item">
-                Settings
-              </button>
-
-              <button className="more-item">
-                About BillStack
-              </button>
-
             </div>
           </section>
         )}
@@ -141,6 +132,8 @@ function App() {
       <MobileNav
         activePage={activePage}
         setActivePage={setActivePage}
+        savedBills={savedBills}
+        setSavedBills={setSavedBills}
       />
 
     </div>
