@@ -59,7 +59,7 @@ function MobileNav({ activePage, setActivePage, setSavedBills, savedBills }) {
             formData.append('bill', file)
 
             try {
-              const response = await fetch('http://192.168.1.14:5000/upload', {
+              const response = await fetch('/api/upload', {
                 method: 'POST',
                 body: formData
               })
