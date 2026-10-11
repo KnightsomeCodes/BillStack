@@ -187,39 +187,97 @@ function App() {
         )}
 
         {/* HOME / DASHBOARD */}
-        {activePage === 'home' && (
-          <section className="bills-section">
-            <div className="section-header">
-              <h2>Recent Bills</h2>
-            </div>
+{activePage === 'home' && (
+  <section className="bills-section">
+    <div className="section-header">
+      <h2>Recent Bills</h2>
+    </div>
 
-            {savedBills.length === 0 ? (
-              <div className="empty-bills">
-                <strong>No bills yet</strong>
-                <p>Your saved bills will appear here.</p>
-              </div>
-            ) : (
-              <div className="bill-list">
-                {savedBills.slice(-3).reverse().map((bill) => (
-                  <BillCard
-                    key={bill.id}
-                    vendor={bill.vendor}
-                    category={bill.category}
-                    amount={bill.totalAmount}
-                    date={bill.date}
-                  />
-                ))}
-              </div>
-            )}
+    {(() => {
+      const term = search.toLowerCase()
 
-            <button
-              className="view-all"
-              onClick={() => setActivePage('bills')}
-            >
-              View All Bills →
-            </button>
-          </section>
-        )}
+      const homeBills = savedBills
+        .filter(bill => {
+          if (
+            term &&
+            !bill.vendor?.toLowerCase().includes(term) &&
+            !bill.category?.toLowerCase().includes(term) &&
+            !bill.invoiceNumber?.toLowerCase().includes(term)
+          ) {
+            return false
+          }
+
+          if (
+            filters.category !== 'All' &&
+            bill.category !== filters.category
+          ) {
+            return false
+          }
+
+          const amount = Number(bill.totalAmount) || 0
+
+          if (
+            filters.amount === 'Below 1000' &&
+            amount >= 1000
+          ) {
+            return false
+          }
+
+          if (
+            filters.amount === '1000-5000' &&
+            (amount < 1000 || amount > 5000)
+          ) {
+            return false
+          }
+
+          if (
+            filters.amount === 'Above 5000' &&
+            amount <= 5000
+          ) {
+            return false
+          }
+
+          return true
+        })
+        .sort((a, b) => {
+          const dateA = new Date(a.date).getTime()
+          const dateB = new Date(b.date).getTime()
+
+          return filters.sort === 'Latest'
+            ? dateB - dateA
+            : dateA - dateB
+        })
+
+      const recentBills = homeBills.slice(0, 3)
+
+      return recentBills.length === 0 ? (
+        <div className="empty-bills">
+          <strong>No bills found</strong>
+          <p>Try changing your search or filters.</p>
+        </div>
+      ) : (
+        <div className="bill-list">
+          {recentBills.map((bill) => (
+            <BillCard
+              key={bill.id}
+              vendor={bill.vendor}
+              category={bill.category}
+              amount={bill.totalAmount}
+              date={bill.date}
+            />
+          ))}
+        </div>
+      )
+    })()}
+
+    <button
+      className="view-all"
+      onClick={() => setActivePage('bills')}
+    >
+      View All Bills →
+    </button>
+  </section>
+)}
 
         {/* ALL BILLS */}
         {activePage === 'bills' && (
